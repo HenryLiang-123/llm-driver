@@ -1,0 +1,227 @@
+**A Language Agent for Autonomous Driving**
+Role: You are the brain of an autonomous vehicle (a.k.a. ego-vehicle). In this step, you need to extract necessary information from the driving scenario. The information you extracted must be useful to the next-step motion planning. 
+
+Necessary information might include the following:
+- Detections: The detected objects that you need to pay attention to.
+- Predictions: The estimated future motions of the detected objects. 
+- Maps: Map information includes traffic lanes and road boundaries.
+- Occunpancy: Occupancy implies whether a location has been occupied by other objects.
+
+Task
+- You should think about what types of information (Detections, Predictions, Maps, Occupancy) you need to extract from the driving scenario.
+- Detections and Predictions are quite important for motion planning. You should call at least one of them if necessary.
+- Maps information are also important. You should pay more attention to road shoulder and lane divider information to your current ego-vehicle location.
+- I will guide you through the thinking process step by step.
+
+*****Ego States:*****
+Current State:
+ - Velocity (vx,vy): (-0.01,0.92)
+ - Heading Angular Velocity (v_yaw): (0.00)
+ - Acceleration (ax,ay): (-0.00,-0.50)
+ - Can Bus: (-0.74,0.14)
+ - Heading Speed: (0.95)
+ - Steering: (-0.02)
+Historical Trajectory (last 2 seconds): [(-0.07,-6.43), (-0.05,-4.34), (-0.02,-2.32), (-0.01,-0.91)]
+Mission Goal: FORWARD
+
+
+
+Do you need to perform detections from the driving scenario?
+Please answer YES or NO.
+
+YES
+You can execute one of the following functions to get object detection results (don't execute functions that have been used before):
+- get_leading_object_detection() #Get the detection of the leading object, the function will return the leading object id and its position and size. If there is no leading object, return None
+- get_object_detections_in_range(x_start, x_end, y_start, y_end) #Get the detections of the objects in a given range (x_start, x_end)*(y_start, y_end)m^2, the function will return a list of object ids and their positions and sizes. If there is no object, return None
+- get_surrounding_object_detections() #Get the detections of the surrounding objects in a 20m*20m range, the function will return a list of surroundind object ids and their positions and sizes. If there is no surrounding object, return None
+- get_front_object_detections() #Get the detections of the objects in front of you in a 10m*20m range, the function will return a list of front object ids and their positions and sizes. If there is no front object, return None
+- get_all_object_detections() #Get the detections of all objects in the whole scene, the function will return a list of object ids and their positions and sizes. Always avoid using this function if there are other choices.
+
+None
+get_front_object_detections
+{}
+Front object detections:
+Front object detected, object type: car, object id: 2, position: (4.36, 9.56), size: (1.86, 4.72)
+Front object detected, object type: car, object id: 3, position: (-3.70, 13.08), size: (2.01, 4.92)
+
+
+Do you need to perform future trajectory predictions for the detected objects?
+Please answer YES or NO.
+
+YES
+You can execute one of the following functions to get object future trajectory predictions (don't execute functions that have been used before):
+- get_leading_object_future_trajectory() #Get the predicted future trajectory of the leading object, the function will return a trajectory containing a series of waypoints. If there is no leading vehicle, return None
+- get_future_trajectories_for_specific_objects(object_ids) #Get the future trajectories of specific objects (specified by a List of object ids), the function will return trajectories for each object. If there is no object, return None
+- get_future_trajectories_in_range(x_start, x_end, y_start, y_end) #Get the future trajectories where any waypoint in this trajectory falls into a given range (x_start, x_end)*(y_start, y_end)m^2, the function will return each trajectory that satisfies the condition. If there is no trajectory satisfied, return None
+- get_future_waypoint_of_specific_objects_at_timestep(object_ids, timestep) #Get the future waypoints of specific objects at a specific timestep, the function will return a list of waypoints. If there is no object or the object does not have a waypoint at the given timestep, return None
+- get_all_future_trajectories() #Get the predicted future trajectories of all objects in the whole scene, the function will return a list of object ids and their future trajectories. Always avoid using this function if there are other choices.
+
+None
+get_future_trajectories_for_specific_objects
+{'object_ids': [2, 3]}
+Future trajectories for specific objects:
+Object type: car, object id: 2, future waypoint coordinates in 3s: [(4.36, 9.56), (4.36, 9.56), (4.36, 9.57), (4.36, 9.57), (4.36, 9.56), (4.36, 9.56)]
+Object type: car, object id: 3, future waypoint coordinates in 3s: [(-2.66, 13.82), (-1.69, 14.79), (-0.99, 16.13), (-0.25, 17.73), (0.19, 19.42), (0.57, 21.35)]
+
+
+Do you need to get occupancy information for this driving scenario?
+Please answer YES or NO.
+
+NO
+
+Do you need to get map information for this driving scenario?
+Please answer YES or NO.
+
+YES
+You can execute one of the following functions to get map information (don't execute functions that have been used before):
+- get_drivable_at_locations(locations) #Get the drivability at the locations [(x_1, y_1), ..., (x_n, y_n)]. If the location is out of the map scope, return None
+- get_lane_category_at_locations(locations, return_score) #Get the lane category at the locations [(x_1, y_1), ..., (x_n, y_n)]. If the location is out of the map scope, return None
+- get_distance_to_shoulder_at_locations(locations) #Get the distance to both sides of road shoulders at the locations [(x_1, y_1), ..., (x_n, y_n)]. If the location is out of the map scope, return None
+- get_current_shoulder() #Get the distance to both sides of road shoulders for the current ego-vehicle location.
+- get_distance_to_lane_divider_at_locations(locations) #Get the distance to both sides of road lane_dividers at the locations [(x_1, y_1), ..., (x_n, y_n)]. If the location is out of the map scope, return None
+- get_current_lane_divider() #Get the distance to both sides of road lane_dividers for the current ego-vehicle location
+- get_nearest_pedestrian_crossing() #Get the location of the nearest pedestrian crossing to the ego-vehicle. If there is no such pedestrian crossing, return None
+
+None
+get_current_shoulder
+{}
+Distance to both sides of road shoulders of current ego-vehicle location:
+Current ego-vehicle's distance to left shoulder is 7.5m and right shoulder is 4.0m
+
+*****Perception Results:*****
+Front object detections:
+Front object detected, object type: car, object id: 2, position: (4.36, 9.56), size: (1.86, 4.72)
+Front object detected, object type: car, object id: 3, position: (-3.70, 13.08), size: (2.01, 4.92)
+
+Future trajectories for specific objects:
+Object type: car, object id: 2, future waypoint coordinates in 3s: [(4.36, 9.56), (4.36, 9.56), (4.36, 9.57), (4.36, 9.57), (4.36, 9.56), (4.36, 9.56)]
+Object type: car, object id: 3, future waypoint coordinates in 3s: [(-2.66, 13.82), (-1.69, 14.79), (-0.99, 16.13), (-0.25, 17.73), (0.19, 19.42), (0.57, 21.35)]
+
+Distance to both sides of road shoulders of current ego-vehicle location:
+Current ego-vehicle's distance to left shoulder is 7.5m and right shoulder is 4.0m
+
+
+
+**A Language Agent for Autonomous Driving**
+Role: You are the brain of an autonomous vehicle (a.k.a. ego-vehicle). In this step, you need to retrieve the most similar past driving experience to help decision-making.
+
+Task
+- You will receive the current driving scenario.
+- You will also receive several past driving experiences.
+- You should decide ONLY ONE experience that is most similar to the current scenario based on the information provided.
+- Please answer ONLY the index (e.g., 0, 1, 2) of the most similar experience.
+
+** Current Scenario: **:
+*****Ego States:*****
+Current State:
+ - Velocity (vx,vy): (-0.01,0.92)
+ - Heading Angular Velocity (v_yaw): (0.00)
+ - Acceleration (ax,ay): (-0.00,-0.50)
+ - Can Bus: (-0.74,0.14)
+ - Heading Speed: (0.95)
+ - Steering: (-0.02)
+Historical Trajectory (last 2 seconds): [(-0.07,-6.43), (-0.05,-4.34), (-0.02,-2.32), (-0.01,-0.91)]
+Mission Goal: FORWARD
+Found 3 relevant experiences:
+** Past Driving Experience 1: **
+*****Past Ego States:*****
+Current State:
+ - Velocity (vx,vy): (0.00,1.07)
+ - Heading Angular Velocity (v_yaw): (-0.00)
+ - Acceleration (ax,ay): (-0.02,-0.43)
+ - Can Bus: (-0.67,0.03)
+ - Heading Speed: (1.00)
+ - Steering: (0.13)
+Historical Trajectory (last 2 seconds): [(-0.16,-6.66), (-0.08,-4.46), (-0.03,-2.55), (-0.00,-1.06)]
+Mission Goal: FORWARD
+** Past Driving Experience 2: **
+*****Past Ego States:*****
+Current State:
+ - Velocity (vx,vy): (-0.01,0.97)
+ - Heading Angular Velocity (v_yaw): (0.00)
+ - Acceleration (ax,ay): (-0.01,-0.46)
+ - Can Bus: (-0.68,0.11)
+ - Heading Speed: (1.16)
+ - Steering: (0.04)
+Historical Trajectory (last 2 seconds): [(-0.06,-6.03), (-0.04,-4.10), (-0.02,-2.40), (-0.01,-0.97)]
+Mission Goal: FORWARD
+** Past Driving Experience 3: **
+*****Past Ego States:*****
+Current State:
+ - Velocity (vx,vy): (-0.01,1.06)
+ - Heading Angular Velocity (v_yaw): (-0.00)
+ - Acceleration (ax,ay): (0.00,-0.32)
+ - Can Bus: (-0.77,0.04)
+ - Heading Speed: (1.06)
+ - Steering: (-0.01)
+Historical Trajectory (last 2 seconds): [(-0.08,-6.01), (-0.05,-4.12), (-0.04,-2.43), (-0.02,-1.06)]
+Mission Goal: FORWARD
+Please return the index 1-3 of the most similar experience: 
+Memory-GPT response: 2
+*****Chain of Thoughts Reasoning:*****
+Thoughts:
+ - Notable Objects: car at (4.36,9.56), moving to (4.36,9.57) at 0.5 second
+   Potential Effects: within the safe zone of the ego-vehicle at 0.5 second
+ - Notable Objects: car at (-3.70,13.08), moving to (-2.66,13.82) at 0.5 second
+   Potential Effects: within the safe zone of the ego-vehicle at 0.5 second
+Driving Plan: MOVE FORWARD WITH A CONSTANT SPEED
+Planned Trajectory:
+[(0.01,0.74), (0.03,1.58), (0.04,2.50), (0.06,3.54), (0.08,4.91), (0.10,6.31)]
+0a0d6b8c2e884134a3b48df43d54c36a
+GPT  Planner:
+ Planned Trajectory:
+[(0.01,0.84), (0.01,1.63), (0.02,2.28), (0.02,2.79), (0.03,3.16), (0.03,3.39)]
+Ground Truth:
+ Planned Trajectory:
+[(0.01,0.74), (0.03,1.58), (0.04,2.50), (0.06,3.54), (0.08,4.91), (0.10,6.31)]
+0a0d6b8c2e884134a3b48df43d54c36a
+*****Ego States:*****
+Current State:
+ - Velocity (vx,vy): (-0.01,0.92)
+ - Heading Angular Velocity (v_yaw): (0.00)
+ - Acceleration (ax,ay): (-0.00,-0.50)
+ - Can Bus: (-0.74,0.14)
+ - Heading Speed: (0.95)
+ - Steering: (-0.02)
+Historical Trajectory (last 2 seconds): [(-0.07,-6.43), (-0.05,-4.34), (-0.02,-2.32), (-0.01,-0.91)]
+Mission Goal: FORWARD
+
+*****Perception Results:*****
+Front object detections:
+Front object detected, object type: car, object id: 2, position: (4.36, 9.56), size: (1.86, 4.72)
+Front object detected, object type: car, object id: 3, position: (-3.70, 13.08), size: (2.01, 4.92)
+
+Future trajectories for specific objects:
+Object type: car, object id: 2, future waypoint coordinates in 3s: [(4.36, 9.56), (4.36, 9.56), (4.36, 9.57), (4.36, 9.57), (4.36, 9.56), (4.36, 9.56)]
+Object type: car, object id: 3, future waypoint coordinates in 3s: [(-2.66, 13.82), (-1.69, 14.79), (-0.99, 16.13), (-0.25, 17.73), (0.19, 19.42), (0.57, 21.35)]
+
+Distance to both sides of road shoulders of current ego-vehicle location:
+Current ego-vehicle's distance to left shoulder is 7.5m and right shoulder is 4.0m
+
+
+
+*****Traffic Rules:*****
+- Avoid collision with other objects.
+- Always drive on drivable regions.
+- Avoid driving on occupied regions.
+- Pay attention to your ego-states and historical trajectory when planning.
+- Maintain a safe distance from the objects in front of you.
+
+*****Past Driving Experience for Reference:*****
+Most similar driving experience from memory with confidence score: 0.75:
+The planned trajectory in this experience for your reference:
+[(0.01,0.98), (0.01,1.87), (0.02,2.40), (0.02,2.64), (0.02,2.76), (0.02,2.86)]
+
+*****Chain of Thoughts Reasoning:*****
+Thoughts:
+ - Notable Objects: car at (4.36,9.56), moving to (4.36,9.57) at 0.5 second
+   Potential Effects: within the safe zone of the ego-vehicle at 0.5 second
+ - Notable Objects: car at (-3.70,13.08), moving to (-2.66,13.82) at 0.5 second
+   Potential Effects: within the safe zone of the ego-vehicle at 0.5 second
+Driving Plan: MOVE FORWARD WITH A CONSTANT SPEED
+(array([[0.01, 0.84],
+       [0.01, 1.63],
+       [0.02, 2.28],
+       [0.02, 2.79],
+       [0.03, 3.16],
+       [0.03, 3.39]]), {'token': '0a0d6b8c2e884134a3b48df43d54c36a', 'Prediction': 'Planned Trajectory:\n[(0.01,0.84), (0.01,1.63), (0.02,2.28), (0.02,2.79), (0.03,3.16), (0.03,3.39)]', 'Ground Truth': 'Planned Trajectory:\n[(0.01,0.74), (0.03,1.58), (0.04,2.50), (0.06,3.54), (0.08,4.91), (0.10,6.31)]'})
